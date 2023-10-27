@@ -12,6 +12,9 @@ describe("Job handle", () => {
   });
 
   it("should clear data and call jobHandle every interval with all values during each interval", async (t) => {
+    console.log(
+      `test should clear data and call jobHandle every interval with all values during each interval`,
+    );
     const jobHandle = t.mock.fn((data) => {
       console.log(`job handle called with data:`);
       console.log(data);
@@ -19,7 +22,7 @@ describe("Job handle", () => {
     const job = new Job({ interval: 200, max: 10, jobHandle });
     for (let i = 1; i < 10; i++) {
       jobHandle.mock.resetCalls(); //
-      const valueLength = randomInteger(2, i + 3); // do not generate too many values otherwise jobHanlder will not be finish before await
+      const valueLength = randomInteger(2, 7); // do not generate too many values otherwise jobHanlder will not be finish before await
       const values = new Array(valueLength)
         .fill(0)
         .map((_, index) => `"value${i} ${index}"`);
@@ -30,7 +33,7 @@ describe("Job handle", () => {
         `test round ${i} before interval`,
       ); //jobHandle is not called yet for this round
       //wait for interval
-      await new Promise((resolve) => setTimeout(resolve, 200 + 150)); //wait for interval 200ms + 150ms for jobHandle to finish
+      await new Promise((resolve) => setTimeout(resolve, 200 + 100)); //wait for interval 200ms + 150ms for jobHandle to finish
       assert.strictEqual(
         jobHandle.mock.calls.length,
         1,
@@ -45,14 +48,19 @@ describe("Job handle", () => {
   });
 
   it("should clear data and call jobHandle every interval with all values during each interval; check after all intervals", async (t) => {
+    console.log(
+      `test should clear data and call jobHandle every interval with all values during each interval; check after all intervals`,
+    );
+    const round = 20;
     const jobHandle = t.mock.fn((data) => {
       console.log(`job handle called with data:`);
       console.log(data);
     });
-    const job = new Job({ interval: 200, max: 10, jobHandle });
+    const job = new Job({ interval: 200, max: round * 2, jobHandle });
+    jobHandle.mock.resetCalls(); //
     assert.strictEqual(jobHandle.mock.calls.length, 0, `test before interval`); //jobHandle is not called yet for this round
-    let i = 1;
-    for (; i <= 10; i++) {
+
+    for (let i = 1; i <= round; i++) {
       const valueLength = randomInteger(2, i + 3); // do not generate too many values otherwise jobHanlder will not be finish before await
       const values = new Array(valueLength)
         .fill(0)
@@ -61,13 +69,11 @@ describe("Job handle", () => {
       //wait for interval
       await new Promise((resolve) => setTimeout(resolve, 210)); //wait for interval 200ms + 10ms to make sure interval is passed
     }
-    await new Promise((resolve) => setTimeout(resolve, 100 * i)); //wait for calls to finish
+    await new Promise((resolve) => setTimeout(resolve, 20 * round)); //wait for calls to finish
     assert.strictEqual(
       jobHandle.mock.calls.length,
-      i,
-      `test round ${i - 1} after intervals, jobHandle should be called ${
-        i - 1
-      } times`,
+      round,
+      `test round ${round} after intervals, jobHandle should be called ${round} times`,
     ); //jobHandle is called
     mock.reset(); // Reset the globally tracked mocks.
   });

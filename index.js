@@ -40,7 +40,7 @@ class Job {
       this.timeout = setTimeout(() => {
         const data = job.data;
         job.data = [];
-        job.jobHandle(data);
+        job.jobHandle.apply(job, [data]);
         //clear timeout after running jobHandle
         clearTimeout(this.timeout);
         job.timeout = undefined;

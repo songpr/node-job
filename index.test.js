@@ -51,7 +51,7 @@ describe("Job handle", () => {
     console.log(
       `test should clear data and call jobHandle every interval with all values during each interval; check after all intervals`,
     );
-    const round = 20;
+    const round = 50;
     const jobHandle = t.mock.fn((data) => {
       console.log(`job handle called with data:`);
       console.log(data);

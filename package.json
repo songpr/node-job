@@ -1,0 +1,25 @@
+{
+  "name": "@songpr/node-job",
+  "version": "1.0.0",
+  "description": "job schedule for node and typescript",
+  "main": "index.js",
+  "scripts": {
+    "test": "tap"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/songpr/node-job.git"
+  },
+  "author": "Pornchai R.",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/songpr/node-job/issues"
+  },
+  "homepage": "https://github.com/songpr/node-job#readme",
+  "dependencies": {
+    "@isaacs/ttlcache": "^1.4.1"
+  },
+  "devDependencies": {
+    "prettier": "3.0.3"
+  }
+}

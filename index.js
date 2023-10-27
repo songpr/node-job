@@ -1,6 +1,13 @@
-import TTLCache from "@isaacs/ttlcache";
+function isNumber(value) {
+  return typeof value === "number" && isFinite(value);
+}
 class Job {
-  constructor({ interval = 1000, max = 10000, jobHandle } = {}) {
+  constructor({
+    interval = 1000,
+    max = 10000,
+    jobHandle,
+    name = `Job_${new Date().getTime()}`,
+  } = {}) {
     if (jobHandle === undefined || typeof jobHandle !== "function") {
       throw new TypeError("jobHandle must be provided and must be a function");
     }
@@ -10,32 +17,37 @@ class Job {
     if (!isNumber(max)) {
       throw new TypeError("max must be a number");
     }
-    const job = this;
-    const dispose = (value, key, reason) => {
-      //reason = set, delete will be ignored
-      if (reason === "stale" || reason === "evict") {
-        //an item in cache is expired, or cache is full
-        //set cache of job to new TTLCache so this cache will be not changed
-        const _cache = job.cache;
-        job.cache = new TTLCache({
-          max: max,
-          ttl: interval,
-          dispose: dispose,
-        });
-        const values = [value, ..._cache.values()];
-        _cache.clear(); //clear cache, and the dispose function will be called for each item with reason = deleted
-        jobHandle(values);
-      }
-    };
-    this.cache = new TTLCache({
-      max: max,
-      ttl: interval,
-      dispose: dispose,
-    });
+    this.interval = interval;
+    this.max = max;
+    this.jobHandle = jobHandle;
+    this.name = name;
+    this.data = [];
   }
+
   addData(value) {
-    this.cache.set(value, value);
+    if (this.data.length >= this.max) {
+      //clear timeout if any
+      if (this.timeout !== undefined) {
+        clearTimeout(this.timeout);
+        this.timeout = undefined;
+      }
+      //call jobHandle with all data and clear data
+      const data = this.data;
+      this.data = [];
+      this.jobHandle(data);
+    } else if (this.timeout === undefined) {
+      const job = this;
+      this.timeout = setTimeout(() => {
+        const data = job.data;
+        job.data = [];
+        job.jobHandle(data);
+        //clear timeout after running jobHandle
+        clearTimeout(this.timeout);
+        job.timeout = undefined;
+      }, this.interval);
+    }
+    this.data.push(value);
   }
 }
 
-module.exports = Job;
+export default Job;

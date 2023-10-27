@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "job schedule for node and typescript",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "tap"
+    "test": "node --test"
   },
   "repository": {
     "type": "git",

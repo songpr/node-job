@@ -13,16 +13,16 @@ export default Job;
  * @param {Object} [options.log] - Log object, must have debug, log, info, warn, error function.
  *
  */
-declare class Job {
+declare class Job<T> {
     constructor({ interval, max, jobHandle, name, log, }?: {
         interval?: number;
         max?: number;
-        jobHandle: Function;
+        jobHandle: function;
         name?: string;
-        log?: any;
+        log?: object;
     });
     readonly interval: number;
     readonly max: number;
     readonly name: number;
-    addData(value: any): void;
+    addData(value: T): void;
 }

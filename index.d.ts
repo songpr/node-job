@@ -17,12 +17,12 @@ declare class Job<T> {
     constructor({ interval, max, jobHandle, name, log, }?: {
         interval?: number;
         max?: number;
-        jobHandle: function;
+        jobHandle: ((data: T[]) => void) | ((data: T[]) => Promise<void>);
         name?: string;
         log?: object;
     });
     readonly interval: number;
     readonly max: number;
-    readonly name: number;
+    readonly name: string;
     addData(value: T): void;
 }

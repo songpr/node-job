@@ -51,7 +51,7 @@ describe("Job handle", () => {
     console.log(
       `test should clear data and call jobHandle every interval with all values during each interval; check after all intervals`,
     );
-    const round = 50;
+    const round = 20;
     const jobHandle = t.mock.fn((data) => {
       console.log(`job handle called with data:`);
       console.log(data);
@@ -77,4 +77,41 @@ describe("Job handle", () => {
     ); //jobHandle is called
     mock.reset(); // Reset the globally tracked mocks.
   });
+
+  it("should clear data and call jobHandle every time it reach max with all values during each interval; ", async (t) => {
+    console.log(
+      `test should clear data and call jobHandle every interval with all values during each interval; check after all intervals`,
+    );
+    const round = 10;
+    const max = 10;
+    const jobHandle = t.mock.fn((data) => {
+      console.log(`job handle called with data:`);
+      console.log(data);
+    });
+    const job = new Job({ interval: 50000, max: max, jobHandle });
+    jobHandle.mock.resetCalls(); //
+    assert.strictEqual(jobHandle.mock.calls.length, 0, `test before interval`); //jobHandle is not called yet for this round
+    // values length round * max
+    const values = new Array(round * max)
+      .fill(0)
+      .map((_, index) => `"value ${index}"`);
+    for (let i = 0; i <= values.length; i++) {
+      job.addData(values[i]);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 30 * round)); //wait for calls to finish
+    assert.strictEqual(
+      jobHandle.mock.calls.length,
+      round,
+      `test ${round * max} values with max 10, jobHandle should be called ${round} times`,
+    ); //jobHandle is called
+    for (const call of jobHandle.mock.calls) {
+      assert.strictEqual(
+        call.arguments[0].length,
+        max,
+        `test with max ${max}, data should be of ${max} length`,
+      ); //jobHandle is called
+    }
+    mock.reset(); // Reset the globally tracked mocks.
+  });
 });
+

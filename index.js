@@ -97,8 +97,7 @@ class Job {
       }
       //call jobHandle with all data and clear data
       const data = this.data;
-      this.data = [];
-      data.push(value); //add new value
+      this.data = [value];
       if (data.length === 0) return; //do nothing if data is empty
       const job = this;
       //run jobHandle async so it will not block the main thread

@@ -1,5 +1,5 @@
 {
-  "name": "@songpr/node-job",
+  "name": "node-interval-job",
   "version": "1.0.0",
   "description": "job schedule for node and typescript",
   "files": [

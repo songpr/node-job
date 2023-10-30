@@ -30,13 +30,8 @@ class Job {
     jobHandle,
     name = `Job_${new Date().getTime()}`,
   } = {}) {
-    if (
-      jobHandle === undefined ||
-      (typeof jobHandle !== "function" && !types.isAsyncFunction(jobHandle))
-    ) {
-      throw new TypeError(
-        "jobHandle must be provided and must be a function or async function",
-      );
+    if (typeof jobHandle !== "function" && !types.isAsyncFunction(jobHandle)) {
+      throw new TypeError("jobHandle must be a function or async function");
     }
     if (!isNumber(interval)) {
       throw new TypeError("interval must be a number");
@@ -77,6 +72,7 @@ class Job {
       const data = this.data;
       this.data = [];
       data.push(value); //add new value
+      //run jobHandle async so it will not block the main thread
       this.jobHandle(data).catch((err) => {
         console.log({ error: err.message, stack: err.stack });
       });

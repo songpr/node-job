@@ -2,7 +2,14 @@
   "name": "@songpr/node-job",
   "version": "1.0.0",
   "description": "job schedule for node and typescript",
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
   "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
   "type": "module",
   "scripts": {
     "test": "node --test"
@@ -18,6 +25,7 @@
   },
   "homepage": "https://github.com/songpr/node-job#readme",
   "devDependencies": {
-    "prettier": "3.0.3"
+    "prettier": "3.0.3",
+    "typescript": "^5.2.2"
   }
 }

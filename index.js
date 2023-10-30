@@ -60,6 +60,8 @@ function setTimeoutBuilder(job) {
  * @param {Number} options.max - Maximum data length.
  * @param {Function} options.jobHandle - Job handle function, must be a function or async function.
  *  will receive data (array) as first argument.
+ * @param {String} [options.name] - Job name.
+ * @param {Object} [options.log] - Log object, must have debug, log, info, warn, error function.
  * 
  */
 

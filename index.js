@@ -1,4 +1,3 @@
-import { log } from "node:console";
 import { types } from "node:util";
 function isNumber(value) {
   return typeof value === "number" && isFinite(value);

@@ -1,7 +1,35 @@
+import { log } from "node:console";
+import { types } from "node:util";
 function isNumber(value) {
   return typeof value === "number" && isFinite(value);
 }
-import { types } from "node:util";
+function validateJobOptions(jobHandle, interval, max, log) {
+  if (typeof jobHandle !== "function" && !types.isAsyncFunction(jobHandle)) {
+    throw new TypeError("jobHandle must be a function or async function");
+  }
+  if (!isNumber(interval)) {
+    throw new TypeError("interval must be a number");
+  }
+  if (interval < 1 || interval > 2147483647) {
+    throw new TypeError(
+      "interval must be greater than 0 and less than 2147483647"
+    );
+  }
+  if (!isNumber(max)) {
+    throw new TypeError("max must be a number");
+  }
+  if (max < 1 || max > 100000000) {
+    throw new TypeError("max must be greater than 0 and less than 100000000");
+  }
+  if (log) {
+    const logLevel = ['debug', 'log', 'info', 'warn', 'error'];
+    for (const level of logLevel) {
+      if (typeof log[level] !== "function") {
+        throw new TypeError(`log.${level} must be a function`);
+      }
+    }
+  }
+}
 
 function setTimeoutBuilder(job) {
   return setTimeout(() => {
@@ -10,10 +38,11 @@ function setTimeoutBuilder(job) {
     //keep timeout reference to clear it after running jobHandle
     const timeout = job.timeout;
     job.timeout = undefined; //clear timeout reference that have been run
+    if (data.length === 0) return; //do nothing if data is empty
     job.jobHandle
       .apply(job, [data])
       .catch((err) => {
-        console.log({ error: err.message, stack: err.stack });
+        job.log.error({ error: err.message, stack: err.stack });
       })
       .finally(() => {
         //clear timeout after running jobHandle
@@ -22,6 +51,18 @@ function setTimeoutBuilder(job) {
       });
   }, job.interval);
 }
+/**
+ * @class Job - Job class run jobHandle with data after interval.
+ * jobHandle will be called with data as first argument, every interval milliseconds, if any only if data is not empty.
+ * if data length >= max, jobHandle will be called immediately, and data will be cleared.
+ * 
+ * @param {Object} options - Job options.
+ * @param {Number} options.interval - Interval in milliseconds.
+ * @param {Number} options.max - Maximum data length.
+ * @param {Function} options.jobHandle - Job handle function, must be a function or async function.
+ *  will receive data (array) as first argument.
+ * 
+ */
 
 class Job {
   constructor({
@@ -29,24 +70,9 @@ class Job {
     max = 10000,
     jobHandle,
     name = `Job_${new Date().getTime()}`,
+    log = console,
   } = {}) {
-    if (typeof jobHandle !== "function" && !types.isAsyncFunction(jobHandle)) {
-      throw new TypeError("jobHandle must be a function or async function");
-    }
-    if (!isNumber(interval)) {
-      throw new TypeError("interval must be a number");
-    }
-    if (interval < 1 || interval > 2147483647) {
-      throw new TypeError(
-        "interval must be greater than 0 and less than 2147483647",
-      );
-    }
-    if (!isNumber(max)) {
-      throw new TypeError("max must be a number");
-    }
-    if (max < 1 || max > 100000000) {
-      throw new TypeError("max must be greater than 0 and less than 100000000");
-    }
+    validateJobOptions(jobHandle, interval, max, log);
     this.interval = interval;
     this.max = max;
     this.timeout = undefined;
@@ -55,6 +81,7 @@ class Job {
       ? jobHandle
       : async (data) => jobHandle(data);
     this.name = name;
+    this.log = log;
     this.data = [];
   }
 
@@ -72,9 +99,11 @@ class Job {
       const data = this.data;
       this.data = [];
       data.push(value); //add new value
+      if (data.length === 0) return; //do nothing if data is empty
+      const job = this;
       //run jobHandle async so it will not block the main thread
       this.jobHandle(data).catch((err) => {
-        console.log({ error: err.message, stack: err.stack });
+        job.log.error({ error: err.message, stack: err.stack });
       });
     } else if (this.timeout === undefined) {
       //case data.length < max and timeout is not set

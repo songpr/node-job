@@ -24,5 +24,6 @@ declare class Job<T> {
     readonly interval: number;
     readonly max: number;
     readonly name: string;
+    readonly log: object;
     addData(value: T): void;
 }

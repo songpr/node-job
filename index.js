@@ -38,8 +38,7 @@ function setTimeoutBuilder(job) {
     const timeout = job.timeout;
     job.timeout = undefined; //clear timeout reference that have been run
     if (data.length === 0) return; //do nothing if data is empty
-    job.jobHandle
-      .apply(job, [data])
+    job.jobHandle(data, job)
       .catch((err) => {
         job.log.error({ error: err.message, stack: err.stack });
       })
@@ -78,9 +77,10 @@ class Job {
     this.max = max;
     this.timeout = undefined;
     //make sure job.jobHandle is always a async function
-    this.jobHandle = types.isAsyncFunction(jobHandle)
+    const _jobHandle = types.isAsyncFunction(jobHandle)
       ? jobHandle
-      : async (data) => jobHandle(data);
+      : async (data) => jobHandle(data, this);
+    this.jobHandle = _jobHandle;
     this.name = name;
     this.log = log;
     this.data = [];
@@ -102,7 +102,7 @@ class Job {
       if (data.length === 0) return; //do nothing if data is empty
       const job = this;
       //run jobHandle async so it will not block the main thread
-      this.jobHandle(data).catch((err) => {
+      this.jobHandle(data, this).catch((err) => {
         job.log.error({ error: err.message, stack: err.stack });
       });
     } else if (this.timeout === undefined) {

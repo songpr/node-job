@@ -11,6 +11,19 @@ describe("Job handle", () => {
     assert.throws(() => new Job(), TypeError);
   });
 
+  it("job passed to jobHandle must be the job", async () => {
+    const job = new Job({
+      interval: 10, max: 10, jobHandle: async (data, thisjob) => {
+        console.log(`job handle called with data:`);
+        console.log(data);
+        console.log(`{this:${JSON.stringify(thisjob)}, job:${JSON.stringify(job)}}`);
+        assert.strictEqual(thisjob, job);
+      }
+    });
+    job.addData("test");
+    await new Promise((resolve) => setTimeout(resolve, 11)); //wait for interval 200ms + 150ms for jobHandle to finish
+  });
+
   it("should clear data and call jobHandle every interval with all values during each interval", async (t) => {
     console.log(
       `test should clear data and call jobHandle every interval with all values during each interval`,
@@ -40,7 +53,7 @@ describe("Job handle", () => {
         `test round ${i} after interval`,
       ); //jobHandle is called
       const call = jobHandle.mock.calls[0];
-      assert.deepStrictEqual(call.arguments, [values]);
+      assert.deepStrictEqual(call.arguments, [values, job]);
       assert.strictEqual(job.data.length, 0); //cache is cleared
     }
 

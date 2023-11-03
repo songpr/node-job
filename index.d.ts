@@ -17,7 +17,7 @@ declare class Job<T, L> {
     constructor({ interval, max, jobHandle, name, log: L, }?: {
         interval?: number;
         max?: number;
-        jobHandle: ((data: T[]) => void) | ((data: T[]) => Promise<void>);
+        jobHandle: ((data: T[], job: Job<T, L>) => void) | ((data: T[], job: Job<T, L>) => Promise<void>);
         name?: string;
         log?: L;
     });

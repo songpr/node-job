@@ -1,4 +1,4 @@
-import { types } from "node:util";
+const { types } = require("node:util");
 function isNumber(value) {
   return typeof value === "number" && isFinite(value);
 }
@@ -116,4 +116,4 @@ class Job {
   }
 }
 
-export default Job;
+module.exports = Job;

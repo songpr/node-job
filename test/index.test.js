@@ -1,6 +1,6 @@
-import { describe, it, mock } from "node:test";
-import assert from "node:assert";
-import Job from "../index.js";
+const { describe, it, mock } = require("node:test");
+const assert = require("node:assert");
+const Job = require("../index.js");
 
 function randomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;

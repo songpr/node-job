@@ -100,7 +100,7 @@
   },
   "include": [
     "*.ts"
-, "index.test.ts"  ],
+, "index.ts"  ],
   "ts-node": {
     "esm": true,
   },

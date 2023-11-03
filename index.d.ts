@@ -7,19 +7,19 @@ export default Job;
  * @param {Object} options - Job options.
  * @param {Number} options.interval - Interval in milliseconds.
  * @param {Number} options.max - Maximum data length.
- * @param {Function} options.jobHandle - Job handle function, must be a function or async function.
+ * @param {Function(T)} options.jobHandle - Job handle function, must be a function or async function.
  *  will receive data (array) as first argument.
  * @param {String} [options.name] - Job name.
- * @param {Object} [options.log] - Log object, must have debug, log, info, warn, error function.
+ * @param {L} [options.log] - Log object, must have debug, log, info, warn, error function.
  *
  */
-declare class Job<T> {
-    constructor({ interval, max, jobHandle, name, log, }?: {
+declare class Job<T, L> {
+    constructor({ interval, max, jobHandle, name, log: L, }?: {
         interval?: number;
         max?: number;
         jobHandle: ((data: T[]) => void) | ((data: T[]) => Promise<void>);
         name?: string;
-        log?: object;
+        log?: L;
     });
     readonly interval: number;
     readonly max: number;

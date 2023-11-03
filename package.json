@@ -1,6 +1,6 @@
 {
   "name": "node-interval-job",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "job schedule for node and typescript",
   "files": [
     "index.js",

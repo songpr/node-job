@@ -21,7 +21,7 @@ function validateJobOptions(jobHandle, interval, max, log) {
     throw new TypeError("max must be greater than 0 and less than 100000000");
   }
   if (log) {
-    const logLevel = ['debug', 'log', 'info', 'warn', 'error'];
+    const logLevel = ['debug', 'log', 'warn', 'error'];
     for (const level of logLevel) {
       if (typeof log[level] !== "function") {
         throw new TypeError(`log.${level} must be a function`);
